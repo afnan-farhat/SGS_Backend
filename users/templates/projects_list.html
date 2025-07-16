@@ -1,0 +1,103 @@
+<!-- templates/projects_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects List</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        function toggleBudgetInput() {
+            const toggle = document.getElementById("toggleBtn");
+            const input = document.getElementById("budgetInput");
+            input.disabled = !toggle.checked;
+        }
+
+        function addRequirementRow() {
+            const tbody = document.getElementById("requirementsTableBody");
+            const rowCount = tbody.rows.length + 1;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+        <td class="border p-2 text-center">${rowCount}</td>
+        <td class="border p-2">
+          <input type="text" class="w-full border rounded px-2 py-1" placeholder="Enter title" />
+        </td>
+      `;
+            tbody.appendChild(row);
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+    <div class="flex items-center justify-between bg-white shadow px-3 py-2 fixed top-0 left-0 right-0 z-10">
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleSidebar()" class="text-gray-700 text-2xl focus:outline-none">☰</button>
+            <img src="SGS_logo.png" alt="Logo" class="h-8" />
+        </div>
+        <div class="flex items-center space-x-2 text-sm text-gray-700">
+            <span>Employee Name</span>
+            <i class="fas fa-user-circle fa-2x"></i>
+        </div>
+    </div>
+
+    <div id="sidebar" style="background-color: #A7C8CD; color: #366C77"
+        class="fixed top-0 left-0 w-64 h-full p-4 space-y-4 transform -translate-x-full transition-transform duration-300 z-20">
+        <button onclick="toggleSidebar()" style="color:#366C77" class="text-xl mb-2">
+            <i class="fas fa-xmark"></i>
+        </button>
+        <img src="sgs_white_logo.png" alt="Logo" class="h-8" />
+        <nav class="space-y-2">
+            <a href="index.html" class="block hover:underline">Projects</a>
+            <a href="dashboard.html" class="block hover:underline">Dashboard</a>
+            <a href="Reporting.html" class="block hover:underline">Reporting</a>
+        </nav>
+        <div class="fixed bottom-0 right-0 w-full text-right py-4 pr-6">
+            <button style="background-color:#366C77" class="mt-4 border px-4 py-2 rounded text-white">Log out</button>
+        </div>
+    </div>
+<br><br>
+<div>
+    <h1>Projects List</h1>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Budget</th>
+                <th>Progress</th>
+                <th>Priority</th>
+                <th>Requestor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.P_ID }}</td>
+                <td>{{ project.P_name }}</td>
+                <td>{{ project.P_description }}</td>
+                <td>{{ project.P_state }}</td>
+                <td>{{ project.p_budget }}</td>
+                <td>{{ project.progress }}%</td>
+                <td>{{ project.priority }}</td>
+                <td>{{ project.requestor }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">No projects found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</body>
+
+</html>
