@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="{% static 'css/Dashboard.css' %}" rel="stylesheet" />
+</head>
+
+<body>
+    <h1>Dashboard</h1>
+
+    <div>
+        <h2>Stats</h2>
+        <p>Total Projects: {{ projects|length }}</p>
+        <p>Total Budget: {{ total_budget }}</p>
+        <p>Completed Projects: {{ status_counts.completed|default:0 }}</p>
+        <p>In Progress: {{ status_counts.in_progress|default:0 }}</p>
+        <!-- Add more stats as needed -->
+    </div>
+
+    <div style="width: 400px; height: 400px;">
+        <canvas id="statusChart"></canvas>
+    </div>
+
+    <script>
+        const statusLabels = {{ status_counts.keys|list|safe }};
+        const statusData = {{ status_counts.values|list|safe }};
+
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Projects Status',
+                    data: statusData,
+                    backgroundColor: [
+                        '#9DD49D', // completed
+                        '#56848D', // in progress
+                        '#F6CE95', // on hold
+                        '#E89895', // pipeline
+                        '#B0BEC5', // not started
+                        '#EF9A9A'  // behind the schedule
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    </script>
+
+    <h2>Projects Table</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Requestor</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Budget</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.P_name }}</td>
+                <td>{{ project.P_state }}</td>
+                <td>{{ project.requestor }}</td>
+                <td>{{ project.p_start_date|date:"Y-m-d" }}</td>
+                <td>{{ project.p_end_date|date:"Y-m-d" }}</td>
+                <td>{{ project.budget }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No projects found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Optional: add export button with JS -->
+    <button onclick="exportTableToExcel('projectsTable', 'Projects')">Export to Excel</button>
+
+    <script>
+      function exportTableToExcel(tableID, filename = ''){
+          var downloadLink;
+          var dataType = 'application/vnd.ms-excel';
+          var tableSelect = document.getElementById(tableID);
+          var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+
+          filename = filename ? filename + '.xls' : 'excel_data.xls';
+
+          downloadLink = document.createElement("a");
+          document.body.appendChild(downloadLink);
+
+          if(navigator.msSaveOrOpenBlob){
+              var blob = new Blob(['\ufeff', tableHTML], { type: dataType });
+              navigator.msSaveOrOpenBlob( blob, filename);
+          } else {
+              downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+              downloadLink.download = filename;
+              downloadLink.click();
+          }
+      }
+    </script>
+</body>
+
+</html>
