@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles', # for images and files
     # 'playground',
     'users',
+    'rest_framework',
+    'corsheaders',
+    
     # 'projects',
     # 'tasks',
     # 'teams',
@@ -59,9 +62,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'DjangoBackend.urls'
+CORS_ALLOW_ALL_ORIGINS = True  
 
 TEMPLATES = [
     {
@@ -138,10 +144,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'users/static'),  # adjust this to match your folder
 ]
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

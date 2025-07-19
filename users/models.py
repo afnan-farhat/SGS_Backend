@@ -18,6 +18,8 @@ class UserProject(models.Model):
     p_end_date = models.DateField(db_column='p_end_date')
     # request_ID = models.IntegerField()
     # dep_ID = models.IntegerField()
+    regulator = models.CharField(max_length=255, blank=True, null=True)  # <-- Added this line
+
 
     class Meta:
         db_table = 'users_project'  # exactly as the MySQL table name
@@ -27,22 +29,21 @@ class UserProject(models.Model):
         return self.P_name
 
 
-class Request(models.Model):
-    Request_ID = models.AutoField(primary_key=True)
-    Project_Title = models.CharField(max_length=255, default='Untitled Project')
-    requestType = models.CharField(max_length=255, default='General')  # note lowercase r
-    Driver = models.CharField(max_length=255, default='N/A')
-    Requirments = models.TextField(default='None')
-    Objective = models.TextField(default='No Objective')
-    Scope = models.CharField(max_length=255, default='General Scope')
-    request_state = models.CharField(max_length=50, default='waiting')
-    dep_ID = models.IntegerField(default=0)
+from django.db import models
 
-    class Meta:
-        db_table = 'users_request'
+class Request(models.Model):
+    request_ID = models.AutoField(primary_key=True)
+    Project_title = models.CharField(max_length=255)
+    requestType = models.CharField(max_length=255)
+    Driver = models.CharField(max_length=255)
+    objective = models.TextField()
+    Scope = models.TextField()
+    Requirments = models.TextField()  # تأكد من التهجئة هنا
+    request_state = models.CharField(max_length=100)
+    dep_ID = models.IntegerField()    
 
     def __str__(self):
-        return self.Project_Title
+        return self.Project_title
 
 
 
