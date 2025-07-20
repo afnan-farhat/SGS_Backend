@@ -16,6 +16,8 @@ class UserProject(models.Model):
     digitalization = models.BooleanField()
     p_start_date = models.DateField(db_column='p_start_date')
     p_end_date = models.DateField(db_column='p_end_date')
+    Project_Manager = models.CharField(max_length=255)
+
     # request_ID = models.IntegerField()
     # dep_ID = models.IntegerField()
     regulator = models.CharField(max_length=255, blank=True, null=True)  # <-- Added this line
@@ -38,7 +40,7 @@ class Request(models.Model):
     Driver = models.CharField(max_length=255)
     objective = models.TextField()
     Scope = models.TextField()
-    Requirments = models.TextField()  # تأكد من التهجئة هنا
+    Requirments = models.TextField() 
     request_state = models.CharField(max_length=100)
     dep_ID = models.IntegerField()    
 
