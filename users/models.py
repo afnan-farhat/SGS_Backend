@@ -1,6 +1,6 @@
 from django.db import models
 from django.shortcuts import render
-
+from django.db import models
 
 class UserProject(models.Model):
     P_ID = models.AutoField(primary_key=True)
@@ -31,7 +31,22 @@ class UserProject(models.Model):
         return self.P_name
 
 
-from django.db import models
+class Employee(models.Model):
+    Emp_ID = models.AutoField(primary_key=True)
+    Emp_name = models.TextField()
+    job_title = models.TextField()
+    email = models.EmailField(unique=True)
+    chat = models.TextField()
+    work_phone = models.TextField()
+    buisness_address = models.TextField()
+    Emp_role = models.TextField()
+
+    class Meta:
+        db_table = 'users_employee'  # exactly as the MySQL table name
+        managed = False            # Django won't manage the table creation or migrations
+
+    def __str__(self):
+        return self.Emp_name
 
 class Request(models.Model):
     request_ID = models.AutoField(primary_key=True)
@@ -42,30 +57,15 @@ class Request(models.Model):
     Scope = models.TextField()
     Requirments = models.TextField() 
     request_state = models.CharField(max_length=100)
+    forwarded = models.BooleanField()
+    approved = models.BooleanField()
+    Assigned = models.BooleanField()
     dep_ID = models.IntegerField()    
+    P_ID = models.ForeignKey(UserProject, on_delete=models.CASCADE, db_column='P_ID')
+    
 
     def __str__(self):
         return self.Project_title
 
 
 
-
-
-def dashboard_view(request):
-    projects = Project.objects.all()
-
-    # Calculate stats in Python, like counts by status, budgets, etc.
-    status_counts = {}
-    total_budget = 0
-    for p in projects:
-        status = p.P_state.lower() if p.P_state else 'unknown'
-        status_counts[status] = status_counts.get(status, 0) + 1
-        total_budget += p.budget if hasattr(p, 'budget') else 0
-
-    context = {
-        'projects': projects,
-        'status_counts': status_counts,
-        'total_budget': total_budget,
-        # Add other processed data needed for charts
-    }
-    return render(request, 'dashboard.html', context)

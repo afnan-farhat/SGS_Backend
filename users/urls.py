@@ -1,14 +1,17 @@
 from django.urls import path
-from .views import ProjectList, request_list, create_new_request, insert_request, success_page
-from .views import RequestCreateAPIView
+from .views import ProjectList, request_list, create_new_request, insert_request, success_page, EmployeeList, RequestCreateAPIView, request_detail_api
+
 
 urlpatterns = [
-    path('users/', ProjectList.as_view(), name='user-list'),  # GET مشاريع
+    path('projects/', ProjectList.as_view(), name='user-list'),  # GET مشاريع
+    path('employee-list/', EmployeeList.as_view(), name='employee-list'),  # GET مشاريع
     path('requests/', request_list, name='request-list'),    # GET طلبات
     path('new-request/', create_new_request, name='new-request'),  # POST إنشاء طلب جديد (API)
+    path('request/<int:request_id>/', request_detail_api, name='request-detail-api'),
+
     # إذا تريد طريقة غير API
     path('insert/', insert_request, name='insert_request'),   # POST من فورم HTML
     path('success/', success_page, name='success_page'),
-        path('api/request/', RequestCreateAPIView.as_view(), name='create-request'),
+    path('api/request/', RequestCreateAPIView.as_view(), name='create-request'),
 
 ]

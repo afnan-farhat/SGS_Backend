@@ -1,6 +1,7 @@
 # users/serializers.py
 from rest_framework import serializers
 from .models import UserProject  
+from .models import Employee  
 
 from .models import Request
 
@@ -9,7 +10,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = UserProject
         fields = '__all__'
 
-
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
 
 class RequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,7 +27,12 @@ class RequestSerializer(serializers.ModelSerializer):
             'Scope',
             'Requirments',
             'request_state',
+            'forwarded',
+            'approved',
+            'Assigned',
             'dep_ID',
+
+            
         ]
 
 
