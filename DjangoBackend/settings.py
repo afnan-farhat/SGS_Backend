@@ -99,7 +99,7 @@ DATABASES = {
     
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'SGS',            # name of your database
+        'NAME': 'SGS2',            # name of your database
         'USER': 'root',           # your MySQL username
         'PASSWORD': 'Af@2105973',         # your MySQL password
         'HOST': '127.0.0.1',            # or 'localhost'

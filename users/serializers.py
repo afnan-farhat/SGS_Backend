@@ -1,39 +1,38 @@
 # users/serializers.py
 from rest_framework import serializers
-from .models import UserProject  
-from .models import Employee  
+from .models import Department, Project, Employee, Stages, Task
 
-from .models import Request
+# 1. Department Serializer
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = '__all__'
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProject
+        model = Project
         fields = '__all__'
 
+# 3. Employee Serializer
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
 
-class RequestSerializer(serializers.ModelSerializer):
+
+# 4. Stages Serializer
+class StagesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Request
-        fields = [
-            'request_ID',
-            'Project_title',
-            'requestType',   # لاحظ نفس اسم الحقل في الموديل
-            'Driver',
-            'objective',
-            'Scope',
-            'Requirments',
-            'request_state',
-            'forwarded',
-            'approved',
-            'Assigned',
-            'dep_ID',
-
-            
-        ]
+        model = Stages
+        fields = '__all__'
 
 
+# 5. Task Serializer
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = '__all__'
 

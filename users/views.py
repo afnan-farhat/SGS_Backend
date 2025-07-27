@@ -1,142 +1,121 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from .models import Department, Project, Employee, Stages, Task
+from .serializers import DepartmentSerializer, ProjectSerializer, EmployeeSerializer, StagesSerializer, TaskSerializer
 from rest_framework.decorators import api_view
-from rest_framework import status
-import json
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import RetrieveAPIView
+from .models import Employee
+from .serializers import EmployeeSerializer
+from .serializers import ProjectSerializer
+from rest_framework.generics import RetrieveUpdateAPIView
+from .models import Project
+from rest_framework.generics import ListCreateAPIView
 
-from .models import UserProject, Request, Employee
-from .serializers import ProjectSerializer, RequestSerializer, EmployeeSerializer
-
-
-# عرض قائمة المشاريع (API)
-class ProjectList(APIView):
+from rest_framework import generics
+# 1. Department: Only GET (read-only)
+class DepartmentView(APIView):
     def get(self, request):
-        projects = UserProject.objects.all()
+        departments = Department.objects.all()
+        serializer = DepartmentSerializer(departments, many=True)
+        return Response(serializer.data)
+
+
+# 2. Project: GET and POST (for JSON file)
+class ProjectView(APIView):
+    def get(self, request):
+        projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
-    
 
+    def post(self, request):
+        serializer = ProjectSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ProjectDetailUpdateAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    lookup_field = 'P_ID'  
+
+from .serializers import ProjectSerializer
+
+class ProjectListCreateAPIView(ListCreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+
+# 3. Employee: GET (as login, based on PRN or email)
+
+
+# List all employees (GET)
 class EmployeeList(APIView):
     def get(self, request):
         employees = Employee.objects.all()
         serializer = EmployeeSerializer(employees, many=True)
         return Response(serializer.data)
-# views.py
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Employee
 
+
+# Login view (POST using email only)
 @api_view(['POST'])
 def login_view(request):
     email = request.data.get('email')
 
     try:
-        employee = Employee.objects.get(email=email)
+        employee = Employee.objects.get(Email=email)  # Use 'Email' with exact field name
         return Response({
             "success": True,
-            "Emp_ID": employee.Emp_ID,
+            "PRN": employee.PRN,
             "Emp_name": employee.Emp_name,
             "Emp_role": employee.Emp_role,
-            "job_title": employee.job_title,
-            "email": employee.email,
-            "chat": employee.chat,
-            "work_phone": employee.work_phone,
-            "buisness_address": employee.buisness_address,
-
-            
+            "Job_title": employee.Job_title,
+            "Email": employee.Email,
+            "Chat": employee.Chat,
+            "Work_phone": employee.Work_phone,
+            "Buisness_address": employee.Buisness_address,
         })
     except Employee.DoesNotExist:
-        return Response({"success": False, "error": "Invalid email"}, status=400)
+        return Response({"success": False, "error": "Invalid email"}, status=status.HTTP_400_BAD_REQUEST)
 
-# عرض قائمة الطلبات (API)
-@api_view(['GET'])
-def request_list(request):
-    requests = Request.objects.all()
-    serializer = RequestSerializer(requests, many=True)
-    return Response(serializer.data)
+class EmployeeLoginView(APIView):
+    def get(self, request):
+        prn = request.query_params.get('PRN', None)
+        email = request.query_params.get('Email', None)
 
+        if prn:
+            try:
+                employee = Employee.objects.get(PRN=prn)
+            except Employee.DoesNotExist:
+                return Response({"error": "Employee not found"}, status=status.HTTP_404_NOT_FOUND)
+        elif email:
+            try:
+                employee = Employee.objects.get(Email=email)
+            except Employee.DoesNotExist:
+                return Response({"error": "Employee not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error": "PRN or Email required"}, status=status.HTTP_400_BAD_REQUEST)
 
-# إنشاء طلب جديد عبر API POST
-@api_view(['POST'])
-def create_new_request(request):
-    serializer = RequestSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# طريقة بديلة (غير REST) لإنشاء طلب من POST عادي (مثال)
-def insert_request(request):
-    if request.method == 'POST':
-        Request.objects.create(
-            Project_Title=request.POST.get('Project_Title', 'Untitled Project'),
-            requestType=request.POST.get('requestType', 'General'),
-            Driver=request.POST.get('Driver', 'N/A'),
-            Objective=request.POST.get('Objective', 'No Objective'),
-            Requirments=request.POST.get('Requirments', 'None'),
-            Scope=request.POST.get('Scope', 'General Scope'),
-            dep_ID=request.POST.get('dep_ID', 1),
-        )
-        return redirect('success_page')
-    return render(request, 'new-project.html')
-
-
-def success_page(request):
-    return render(request, 'success.html')
-# users/views.py
-from rest_framework.generics import CreateAPIView
-from .models import Request
-from .serializers import RequestSerializer
-
-class RequestCreateAPIView(CreateAPIView):
-    queryset = Request.objects.all()
-    serializer_class = RequestSerializer
-    
-def post(self, request, *args, **kwargs):
-    print("Received data:", request.data)
-    return super().post(request, *args, **kwargs)
+        serializer = EmployeeSerializer(employee)
+        return Response(serializer.data)
 
 
 
-def request_detail_api(request, request_id):
-    request_instance = get_object_or_404(Request.objects.select_related('P_ID'), request_ID=request_id)
 
-    data = {
-        'request_id': request_instance.request_ID,
-        'project_title': request_instance.Project_title,
-        'request_type': request_instance.requestType,
-        'driver': request_instance.Driver,
-        'objective': request_instance.objective,
-        'scope': request_instance.Scope,
-        'requirements': request_instance.Requirments,
-        'request_state': request_instance.request_state,
-        'forwarded':request_instance.forwarded,
-        'approved':request_instance.approved,
-        'Assigned':request_instance.Assigned,
-        'dep_id': request_instance.dep_ID,
+class EmployeeDetail(RetrieveAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    lookup_field = 'PRN'
 
-        'project': {
-            'P_ID': request_instance.P_ID.P_ID,
-            'P_name': request_instance.P_ID.P_name,
-            'P_description': request_instance.P_ID.P_description,
-            'P_state': request_instance.P_ID.P_state,
-            'p_budget': str(request_instance.P_ID.p_budget),  # Decimal to string
-            'p_budgeted': request_instance.P_ID.p_budgeted,
-            'progress': request_instance.P_ID.progress,
-            'priority': request_instance.P_ID.priority,
-            'requestor': request_instance.P_ID.requestor,
-            'digital_starategy': request_instance.P_ID.digital_starategy,
-            'digitalization': request_instance.P_ID.digitalization,
-            'regulator': request_instance.P_ID.regulator,
-            'p_start_date': request_instance.P_ID.p_start_date.strftime('%Y-%m-%d'),
-            'p_end_date': request_instance.P_ID.p_end_date.strftime('%Y-%m-%d'),
-            'Project_Manager': request_instance.P_ID.Project_Manager,
-        }
-    }
+# 4. (Optional) Stages: Full CRUD
+class StagesViewSet(viewsets.ModelViewSet):
+    queryset = Stages.objects.all()
+    serializer_class = StagesSerializer
 
-    return JsonResponse(data)
+
+# 5. (Optional) Task: Full CRUD
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
