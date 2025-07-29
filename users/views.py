@@ -12,8 +12,11 @@ from .serializers import ProjectSerializer
 from rest_framework.generics import RetrieveUpdateAPIView
 from .models import Project
 from rest_framework.generics import ListCreateAPIView
-
+import pandas as pd
+from django.http import JsonResponse
 from rest_framework import generics
+
+import numpy as np  
 # 1. Department: Only GET (read-only)
 class DepartmentView(APIView):
     def get(self, request):
@@ -119,3 +122,20 @@ class StagesViewSet(viewsets.ModelViewSet):
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+
+# views.py
+
+# ✅ Import NumPy for NaN detection
+
+def extension_list(request):
+    try:
+        df = pd.read_excel('users/data/dataProject.xlsx')
+
+        # ✅ Convert all NaN to None (JSON-safe)
+        df = df.replace({np.nan: None})
+
+        data = df.to_dict(orient='records')
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

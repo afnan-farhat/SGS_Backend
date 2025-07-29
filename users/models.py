@@ -8,7 +8,7 @@ class Department(models.Model):
         return self.Dep_name
 
 class Project(models.Model):
-    P_ID = models.AutoField(primary_key=True, default=10)
+    P_ID = models.AutoField(primary_key=True, default=14)
     Project_title = models.CharField(max_length=200)
     Request_type = models.CharField(max_length=50)
     Drive = models.CharField(max_length=100)

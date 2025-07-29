@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from users.views import EmployeeDetail
 from users.views import ProjectListCreateAPIView, ProjectDetailUpdateAPIView
+from users.views import extension_list
 
     
 
@@ -31,6 +32,7 @@ def api_root(request):
             "stages": "/stages/",
             "tasks": "/tasks/",
             "project-detail-update": "projects/<int:P_ID>/",
+            "extension-list" : "extensions/"
             # Add any other endpoints here
         }
     })
@@ -52,4 +54,6 @@ urlpatterns = [
     path('employees/<int:PRN>/', EmployeeDetail.as_view(), name='employee-detail'),
     path('projects/', ProjectListCreateAPIView.as_view(), name='project-list-create'),
     path('projects/<int:P_ID>/', ProjectDetailUpdateAPIView.as_view(), name='project-detail-update'),
+    path('extensions/', extension_list, name='extension-list'),
+
 ]
