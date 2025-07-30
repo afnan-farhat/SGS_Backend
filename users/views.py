@@ -15,6 +15,12 @@ from rest_framework.generics import ListCreateAPIView
 import pandas as pd
 from django.http import JsonResponse
 from rest_framework import generics
+from django.views.decorators.csrf import csrf_exempt
+
+from django.core.mail import send_mail
+import json
+
+
 
 import numpy as np  
 # 1. Department: Only GET (read-only)
@@ -139,3 +145,46 @@ def extension_list(request):
         return JsonResponse(data, safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.core.mail import send_mail
+import json
+
+@csrf_exempt
+def send_extension_email(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            subject = f"Extension {data['status']} - {data['projectName']}"
+            message = f"""
+Project: {data['projectName']}
+Status: {data['status']}
+Requested Date: {data['requestedDate']}
+Reason: {data['reason']}
+Extended Days: {data['extendedDays']}
+Sent by: {data['senderEmail']}
+            """
+
+            recipient = "4fnan.f@gamil.com"  # Replace with actual recipient
+
+            send_mail(
+                subject,
+                message,
+                data['senderEmail'],  # Use sender’s email as from email
+                [recipient],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'message': 'Email sent successfully'})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    else:
+        # Return 405 Method Not Allowed for any non-POST request
+        return HttpResponseNotAllowed(['POST'], 'Only POST requests are allowed.')
+

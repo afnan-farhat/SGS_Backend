@@ -17,6 +17,7 @@ from django.urls import reverse
 from users.views import EmployeeDetail
 from users.views import ProjectListCreateAPIView, ProjectDetailUpdateAPIView
 from users.views import extension_list
+from users.views import send_extension_email
 
     
 
@@ -32,8 +33,11 @@ def api_root(request):
             "stages": "/stages/",
             "tasks": "/tasks/",
             "project-detail-update": "projects/<int:P_ID>/",
-            "extension-list" : "extensions/"
+            "extension-list" : "extensions/",
             # Add any other endpoints here
+            "send_extension_email" : "send_extension_email/"
+
+            
         }
     })
 
@@ -55,5 +59,6 @@ urlpatterns = [
     path('projects/', ProjectListCreateAPIView.as_view(), name='project-list-create'),
     path('projects/<int:P_ID>/', ProjectDetailUpdateAPIView.as_view(), name='project-detail-update'),
     path('extensions/', extension_list, name='extension-list'),
+    path('send_extension_email/', send_extension_email, name='send_extension_email'),
 
 ]
