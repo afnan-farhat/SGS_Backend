@@ -8,7 +8,7 @@ class Department(models.Model):
         return self.Dep_name
 
 class Project(models.Model):
-    P_ID = models.AutoField(primary_key=True, default=14)
+    P_ID = models.AutoField(primary_key=True, default=18)
     Project_title = models.CharField(max_length=200)
     Request_type = models.CharField(max_length=50)
     Drive = models.CharField(max_length=100)
@@ -56,6 +56,47 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.Emp_name
+
+
+class Manages(models.Model):
+    Manager_PRN = models.AutoField(primary_key=True, db_column='Manager_PRNN')
+    Manager_name = models.CharField(max_length=255, db_column='Manager_name')
+    Manager_Grade = models.CharField(max_length=50, blank=True, db_column='Manager_Grade')
+    Employee_count = models.IntegerField(default=True, db_column='Employee_count')
+  
+    def __str__(self):
+        return self.Manager_name
+
+class Employee2(models.Model):
+    PRN = models.AutoField(primary_key=True, db_column='PRN')
+    Emp_name = models.CharField(max_length=255, db_column='Emp_name')
+    Grade = models.CharField(max_length=50, blank=True, db_column='Grade')
+    Emp_status = models.BooleanField(default=True, db_column='Emp_status')
+    Station = models.CharField(max_length=255, blank=True, db_column='Station')
+    
+    Department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, db_column='Dep_name')
+    P_ID = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True, db_column='P_ID')
+    
+    Manager_PRN = models.ForeignKey(Manages, on_delete=models.SET_NULL, null=True, blank=True, db_column='Manager_PRN')
+    Emp_role = models.CharField(max_length=50, db_column='Emp_role')
+
+    def save(self, *args, **kwargs):
+        manager_grades = ['S3', 'S4', 'P1', 'P2', 'P3', 'P4', 'M1', 'M2', 'M3']
+        it_governance_grades = ['M4', 'M5']
+
+        if self.Grade in manager_grades:
+            self.Emp_role = 'manager'
+        elif self.Grade in it_governance_grades:
+            self.Emp_role = 'it_governace'
+        else:
+            self.Emp_role = 'employee'
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.Emp_name
+
+
 
 
 class Stages(models.Model):

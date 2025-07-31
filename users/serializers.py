@@ -1,6 +1,6 @@
 # users/serializers.py
 from rest_framework import serializers
-from .models import Department, Project, Employee, Stages, Task
+from .models import Department, Project, Employee, Stages, Task, Manages
 
 # 1. Department Serializer
 
@@ -20,6 +20,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
+        fields = '__all__'
+
+
+# 4. Manages Serializer
+class ManagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Manages
         fields = '__all__'
 
 
